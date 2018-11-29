@@ -12,36 +12,38 @@ let first_sm_marker;
 let second_sm_marker;
 
 
-app.get('/', (req, res) => {
+app.get('/', async(req, res) => {
 
-  request
-    .get('https://sitv.ru/actirovka/')
-    .end((err, res) => {
-      const $ = cheerio.load(res.text);
-      const date = $('.activ').children().eq(0).text();
-      const first_sm = $('.activ').children().eq(1).text();
-      const first_sm_data = $('.activ').children().eq(2).text();
-      const second_sm = $('.activ').children().eq(3).text();
-      const second_sm_data = $('.activ').children().eq(4).text();
-      const empty_data = 'Данных нет, информация обновляется после 06:00 и после 11:00';
-      
+  const req_data = await request.get('https://sitv.ru/actirovka/');
+
+  const $ = await cheerio.load(req_data.text);
+
+  const date = $('.activ').children().eq(0).text();
+  const first_sm = $('.activ').children().eq(1).text();
+  const first_sm_data = $('.activ').children().eq(2).text();
+  const second_sm = $('.activ').children().eq(3).text();
+  const second_sm_data = $('.activ').children().eq(4).text();
+  const empty_data = 'Данных нет, информация обновляется после 06:00 и после 11:00';
+
+      let res_data = empty_data;
+
       if (first_sm_data !== empty_data) {
         if (first_sm_marker !== date) {
           first_sm_marker = date;
-          sendMails(date,fisrt_sm,first_sm_data);
+          sendMails(date,first_sm,first_sm_data);
+          res_data = `Email sent: / ${date} / ${first_sm} / ${first_sm_data}`;
         }
       }
       
       if (second_sm_data !== empty_data) {
         if (second_sm_marker !== date) {
           second_sm_marker = date;
-          sendMails(date,second_sm,second_sm_data);
+          sendMails(date,_sm,second_sm_data);
+          res_data = `Email sent: / ${date} / ${second_sm} / ${second_sm_data}`;
         }
       }
 
-    });
-    
-  res.send('200 OK');
+  res.send(res_data);
 
 })
 
