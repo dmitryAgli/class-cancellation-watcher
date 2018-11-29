@@ -10,10 +10,10 @@ const mail_list = ['dmitry.agli@gmail.com'];
 
 let first_sm_marker;
 let second_sm_marker;
-const empty_data = 'Данных нет, информация обновляется после 06:00 и после 11:00';
+
 
 app.get('/', (req, res) => {
-  
+
   request
     .get('https://sitv.ru/actirovka/')
     .end((err, res) => {
@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
       const first_sm_data = $('.activ').children().eq(2).text();
       const second_sm = $('.activ').children().eq(3).text();
       const second_sm_data = $('.activ').children().eq(4).text();
+      const empty_data = 'Данных нет, информация обновляется после 06:00 и после 11:00';
       
       if (first_sm_data !== empty_data) {
         if (first_sm_marker !== date) {
@@ -37,7 +38,7 @@ app.get('/', (req, res) => {
           sendMails(date,second_sm,second_sm_data);
         }
       }
-  
+
     });
     
   res.send('200 OK');
