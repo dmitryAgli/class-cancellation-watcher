@@ -6,7 +6,7 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || '3000';
 
-const mail_list = ['dmitry.agli@gmail.com','milena290510@yandex.ru'];
+const mail_list = ['dmitry.agli@gmail.com'];
 
 let markers = {
   first_sm_marker: '',
@@ -42,8 +42,8 @@ app.get('/', async(req, res, next) => {
             res_data = "The email is have already sent";
             if (markers[sm_marker] !== date) {
               markers[sm_marker] = date;
-              sendMails(date,first_sm,first_sm_data);
-              res_data = `Email sent: / ${date} / ${first_sm} / ${first_sm_data}`;
+              sendMails(date,sm,sm_data);
+              res_data = `Email sent: / ${date} / ${sm} / ${sm_data}`;
             }
           }
         }
