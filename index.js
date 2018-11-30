@@ -48,6 +48,7 @@ app.get('/', async(req, res, next) => {
           }
         }
     
+    console.log(res_data);
     res.send(res_data);
 
   }
