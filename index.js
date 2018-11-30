@@ -6,7 +6,7 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || '3000';
 
-const mail_list = ['dmitry.agli@gmail.com'];
+const mail_list = ['dmitry.agli@gmail.com','milena290510@yandex.ru'];
 
 let markers = {
   first_sm_marker: '',
