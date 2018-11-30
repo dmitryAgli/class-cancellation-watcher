@@ -59,7 +59,7 @@ function sendMails(date,sm,sm_data) {
     service: 'Yandex',
     auth: {
       user: 'dmitry.agli@yandex.ru',
-      pass: 'ads328654'
+      pass: 'Qq10102018'
     },
     tls: {
       rejectUnauthorized: false
