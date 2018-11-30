@@ -69,7 +69,7 @@ function sendMails(date,sm,sm_data) {
   const mailOptions = {
     from: 'dmitry.agli@yandex.ru',
     to: mail_list,
-    subject: `ВНИМАНИЕ! Актировка ${sm}`,
+    subject: `ВНИМАНИЕ! Актировка ${date} ${sm}`,
     text: `
     ${date} 
     
