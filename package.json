@@ -1,7 +1,7 @@
 {
-  "name": "aktirovka-app",
+  "name": "class-cancellation-watcher",
   "version": "1.0.0",
-  "description": "simple microservice which send email when it is too cold go to school",
+  "description": "simple service which sends an email when it is too cold to go to school",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
