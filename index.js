@@ -1,27 +1,44 @@
 const request = require('superagent');
 const cheerio = require('cheerio');
 const nodemailer = require('nodemailer');
-const express = require('express')
+const express = require('express');
+const MongoClient = require('mongodb').MongoClient;
 
 const app = express()
 const port = process.env.PORT || '3000';
 
-const mail_list = ['dmitry.agli@gmail.com','milena290510@yandex.ru'];
+let client;
+async function connectDB() {
+    const url = 'mongodb://heroku_qhth26ww:4881jn68umbadudr95p5omosa6@ds147030.mlab.com:47030/heroku_qhth26ww';
+    const dbname = 'heroku_qhth26ww';
 
-let markers = {
-  first_sm_marker: '',
-  second_sm_marker: ''
-}
+    try {
+      if (!client) {
+        client = await MongoClient.connect(url,{useNewUrlParser:true});
+      }
+      return client.db(dbname)
+    } catch(err) {
+      return Promise.reject(err);
+    }
+    
+};
+    
+const mail_list = ['dmitry.agli@gmail.com','milena290510@yandex.ru'];
 
 app.get('/', async(req, res, next) => {
 
+  const db = await connectDB().catch((err)=> {
+    res.send('DB is not available, please try later');
+    next(err);
+  });;
+
   const req_data = await request.get('https://sitv.ru/actirovka/')
   .catch((err)=> {
-    res.send('Resource not available')
+    res.send('External resource is not available, please try later');
     next(err);
   });
 
-  if(req_data) {
+  if(req_data&&db) {
 
     const $ = await cheerio.load(req_data.text);
   
@@ -34,16 +51,37 @@ app.get('/', async(req, res, next) => {
   
         let res_data = empty_data;
 
-        checkConditions(date,first_sm,first_sm_data,'first_sm_marker');
-        checkConditions(date,second_sm,second_sm_data,'second_sm_marker');
+        await checkConditions(date,first_sm,first_sm_data,'first_sm_marker');
+        await checkConditions(date,second_sm,second_sm_data,'second_sm_marker');
         
-        function checkConditions(date,sm,sm_data,sm_marker) {
+        async function checkConditions(date,sm,sm_data,sm_marker) {
           if (sm_data !== empty_data) {
-            res_data = "The email is have already sent";
-            if (markers[sm_marker] !== date) {
-              markers[sm_marker] = date;
+              
+            const collection = db.collection('markers');
+            
+            let markerDoc = await collection.findOne({
+              sm: sm_marker
+            });
+              
+            if(!markerDoc) {
+              markerDoc = await collection.insertOne({
+                sm: sm_marker,
+                date: ''
+              })
+            }
+
+            if (markerDoc.date !== date) {
+              markerDoc = await collection.updateOne({
+                sm: sm_marker
+              },{
+                $set: {
+                  date: date
+                }
+              });
               sendMails(date,sm,sm_data);
               res_data = `Email sent: / ${date} / ${sm} / ${sm_data}`;
+            } else {
+              res_data = "The email is have already sent";
             }
           }
         }
@@ -89,7 +127,7 @@ function sendMails(date,sm,sm_data) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  console.log(`err.message: ${err.message}`);
+  console.log(`Error Handler: ${err.message}`);
 });
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
